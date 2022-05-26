@@ -1,1 +1,184 @@
-Hello world!
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>learnVue3</title>
+    <script src="https://unpkg.com/vue/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+    <div id="counter">
+        <p>Counter: {{ counter }}</p>
+        <p>Using v-html: <span v-html="rawHtml"></span></p>
+
+    </div>
+
+    <div id="bind-attribute">
+        <span :title="message">
+            stay here for a few seconds!
+        </span>
+    </div>
+
+    <div id="event-handling">
+        <p>{{ message }}</p>
+        <button @click="reverseMessage">reverse it!</button>
+    </div>
+
+    <div id="two-way-binding">
+        <p>{{ message }}</p>
+        <input v-model="message" />
+    </div>
+
+    <div id="watch-example">
+        <p>
+            Ask a yes/no question:
+            <input v-model="question" />
+        </p>
+        <p>{{ answer }}</p>
+    </div>
+
+    <div id="todo-list-example">
+        <form v-on:submit.prevent="addNewTodo">
+            <label for="new-todo">Add a todo</label>
+            <input v-model="newTodoText" id="new-todo" placeholder="E.g. Study" />
+            <button>Add</button>
+        </form>
+        <ul>
+            <todo-item v-for="(todo, index) in todos" :key="todo.id" :title="todo.title"
+                @remove="todos.splice(index, 1)"></todo-item>
+        </ul>
+    </div>
+
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    newTodoText: '',
+                    todos: [
+                        {
+                            id: 1,
+                            title: 'study Vue'
+                        },
+                        {
+                            id: 2,
+                            title: 'Computer Network Lab'
+                        },
+                        {
+                            id: 3,
+                            title: 'Essay Homework'
+                        }
+                    ],
+                    nextTodoId: 4
+                }
+            },
+            methods: {
+                addNewTodo() {
+                    this.todos.push({
+                        id: this.nextTodoId++,
+                        title: this.newTodoText
+                    })
+                    this.nextTodoText = ''
+                }
+            }
+        })
+        app.component('todo-item', {
+            template: `
+                <li>
+                    {{title}}
+                    <button @click="$emit('remove')">Remove</button>
+                </li>
+            `,
+            props: ['title'],
+            emits: ['remove']
+        })
+        app.mount('#todo-list-example')
+    </script>
+
+
+
+
+
+    <script>
+        const Counter = {
+            data() {
+                return {
+                    counter: 0,
+                    rawHtml: '<span style="color: red">This should be red.</span>'
+                }
+            },
+            mounted() {
+                setInterval(() => {
+                    this.counter++
+                }, 1000)
+            }
+        }
+
+        const AttributeBinding = {
+            data() {
+                return {
+                    message: 'You loaded this on ' + new Date().toLocaleString()
+                }
+            }
+        }
+
+        const EventHandling = {
+            data() {
+                return {
+                    message: 'Hello Vue.js'
+                }
+            },
+            methods: {
+                reverseMessage() {
+                    this.message = this.message.split('').reverse().join('')
+                }
+            }
+        }
+
+        const TwoWayBinding = {
+            data() {
+                return {
+                    message: 'Hello Vue!'
+                }
+            }
+        }
+
+        const watchExampleVM = Vue.createApp({
+            data() {
+                return {
+                    question: '',
+                    answer: 'Questions usually contain a question mark. ;-)'
+                }
+            },
+            watch: {
+                question(newQuestion, oldQuestion) {
+                    if (newQuestion.indexOf('?') > -1) {
+                        this.getAnswer()
+                    }
+                }
+            },
+            methods: {
+                getAnswer() {
+                    this.answer = 'Thinking...'
+                    axios.get('https://yesno.wtf/api')
+                        .then(response => {
+                            this.answer = response.data.answer
+                        })
+                        .catch(error => {
+                            this.answer = 'Error! Could not reach the API. ' + arror
+                        })
+                }
+            }
+        })
+
+        Vue.createApp(Counter).mount('#counter')
+        Vue.createApp(AttributeBinding).mount('#bind-attribute')
+        Vue.createApp(EventHandling).mount('#event-handling')
+        Vue.createApp(TwoWayBinding).mount('#two-way-binding')
+        watchExampleVM.mount('#watch-example')
+
+    </script>
+</body>
+
+</html>
